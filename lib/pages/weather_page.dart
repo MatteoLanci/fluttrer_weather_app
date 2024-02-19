@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:weather_app/models/weather_model.dart';
@@ -14,9 +16,14 @@ class _WeatherPageState extends State<WeatherPage> {
   // api key
   final _weatherService = WeatherService();
   Weather? _weather;
+  bool _isError = false;
 
   // fetch weather method
   _fetchWeather() async {
+    setState(() {
+      _isError = false;
+    });
+
     // get current city
     String cityName = await _weatherService.getCurrentCity();
 
@@ -29,6 +36,17 @@ class _WeatherPageState extends State<WeatherPage> {
       });
     } catch (e) {
       print(e);
+
+      setState(() {
+        _isError = true;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error fetching weather data. Please try again.'),
+          duration: Duration(seconds: 3),
+        ),
+      );
     }
   }
 
@@ -74,22 +92,58 @@ class _WeatherPageState extends State<WeatherPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // city name
-            Text(_weather?.cityName ?? 'loading city ...'),
+      //! refresh data with iconBtn in Appbar approach
+      // appBar: AppBar(
+      //   title: const Text('Weather App'),
+      //   actions: [
+      //     IconButton(
+      //       onPressed: () {
+      //         _fetchWeather();
+      //       },
+      //       icon: const Icon(Icons.refresh),
+      //     ),
+      //   ],
+      // ),
+      body: RefreshIndicator(
+        onRefresh: () => _fetchWeather(),
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Center(
+            child: _isError
+                ? const Text(
+                    'Error while fetching weather data, please try again')
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 100),
+                      // city name
+                      Text(_weather?.cityName ?? 'loading city ...'),
 
-            // animation
-            Lottie.asset(getWeatherAnimation(_weather?.mainCondition)),
+                      // animation
+                      Lottie.asset(
+                          getWeatherAnimation(_weather?.mainCondition)),
 
-            // temperature
-            Text('${_weather?.temperature.round().toString()} C'),
+                      // temperature
+                      Text('${_weather?.temperature.round().toString()} °C'),
 
-            // weather condition
-            Text(_weather?.mainCondition ?? ''),
-          ],
+                      // weather condition
+                      Text(_weather?.mainCondition ?? ''),
+
+                      // additional info
+                      Padding(
+                        padding: const EdgeInsets.all(40),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text('${_weather?.minTemp.round().toString()} °C'),
+                            const SizedBox(width: 40),
+                            Text('${_weather?.maxTemp.round().toString()} °C'),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
         ),
       ),
     );
