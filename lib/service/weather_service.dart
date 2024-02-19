@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 
 class WeatherService {
   static const BASE_URL = 'http://api.openweathermap.org/data/2.5/weather';
-  final String apiKey = dotenv.env['OPENWEATHERMAP_API_KEY']!;
+  final String apiKey = dotenv.env['OPENWEATHER_API_KEY']!;
 
   WeatherService();
 
