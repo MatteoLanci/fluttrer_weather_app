@@ -3,8 +3,6 @@ import 'package:lottie/lottie.dart';
 import 'package:weather_app/models/weather_model.dart';
 import 'package:weather_app/service/weather_service.dart';
 
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-
 class WeatherPage extends StatefulWidget {
   const WeatherPage({super.key});
 
@@ -36,8 +34,9 @@ class _WeatherPageState extends State<WeatherPage> {
 
   // weather animations > lottie
   String getWeatherAnimation(String? mainCondition) {
-    if (mainCondition == null)
+    if (mainCondition == null) {
       return 'assets/sunny.json'; //default to sunny condition
+    }
 
     switch (mainCondition.toLowerCase()) {
       case 'clouds':
