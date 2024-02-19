@@ -4,9 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:weather_app/models/weather_model.dart';
 import 'package:weather_app/service/weather_service.dart';
+import 'package:weather_app/themes/themes.dart';
 
 class WeatherPage extends StatefulWidget {
-  const WeatherPage({super.key});
+  final Function(ThemeData) onThemeChange;
+
+  const WeatherPage({
+    super.key,
+    required this.onThemeChange,
+  });
 
   @override
   State<WeatherPage> createState() => _WeatherPageState();
@@ -47,6 +53,13 @@ class _WeatherPageState extends State<WeatherPage> {
           duration: Duration(seconds: 3),
         ),
       );
+    }
+
+    var now = DateTime.now();
+    if (now.hour >= 17 || now.hour <= 5) {
+      widget.onThemeChange(AppThemes.darkTheme);
+    } else {
+      widget.onThemeChange(AppThemes.lightTheme);
     }
   }
 
@@ -135,9 +148,25 @@ class _WeatherPageState extends State<WeatherPage> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text('${_weather?.minTemp.round().toString()} °C'),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.arrow_drop_down_sharp),
+                                Text(
+                                  '${_weather?.minTemp.round().toString()} °C',
+                                ),
+                              ],
+                            ),
                             const SizedBox(width: 40),
-                            Text('${_weather?.maxTemp.round().toString()} °C'),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.arrow_drop_up_sharp),
+                                Text(
+                                  '${_weather?.maxTemp.round().toString()} °C',
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
