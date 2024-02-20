@@ -19,23 +19,33 @@ class WeatherPage extends StatefulWidget {
 }
 
 class _WeatherPageState extends State<WeatherPage> {
-  // api key
+  final TextEditingController _searchController = TextEditingController();
   final _weatherService = WeatherService();
   Weather? _weather;
   bool _isError = false;
 
-  // fetch weather method
-  _fetchWeather() async {
+  //? init state
+  @override
+  void initState() {
+    //! fetch weather on startup
+    _fetchWeather();
+    super.initState();
+  }
+
+  //? fetch weather method
+  _fetchWeather([String? cityName]) async {
     setState(() {
       _isError = false;
     });
 
-    // get current city
-    String cityName = await _weatherService.getCurrentCity();
+    final selectedCityName = cityName ?? await _weatherService.getCurrentCity();
 
-    // get weather data for selected city
+    //? get current city
+    // String cityName = await _weatherService.getCurrentCity();
+
+    //? get weather data for selected city
     try {
-      final weather = await _weatherService.getWeather(cityName);
+      final weather = await _weatherService.getWeather(selectedCityName);
 
       setState(() {
         _weather = weather;
@@ -55,6 +65,10 @@ class _WeatherPageState extends State<WeatherPage> {
       );
     }
 
+    //? clear searchbar + hiding keyboard after function triggered
+    _searchController.clear();
+    FocusScope.of(context).unfocus();
+
     var now = DateTime.now();
     if (now.hour >= 17 || now.hour <= 5) {
       widget.onThemeChange(AppThemes.darkTheme);
@@ -63,10 +77,10 @@ class _WeatherPageState extends State<WeatherPage> {
     }
   }
 
-  // weather animations > lottie
+  //? weather animations > lottie
   String getWeatherAnimation(String? mainCondition) {
     if (mainCondition == null) {
-      return 'assets/sunny.json'; //default to sunny condition
+      return 'assets/sunny.json'; //!default to sunny condition
     }
 
     switch (mainCondition.toLowerCase()) {
@@ -94,29 +108,21 @@ class _WeatherPageState extends State<WeatherPage> {
     }
   }
 
-  // init state
-  @override
-  void initState() {
-    // fetch weather on startup
-    _fetchWeather();
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //! refresh data with iconBtn in Appbar approach
-      // appBar: AppBar(
-      //   title: const Text('Weather App'),
-      //   actions: [
-      //     IconButton(
-      //       onPressed: () {
-      //         _fetchWeather();
-      //       },
-      //       icon: const Icon(Icons.refresh),
-      //     ),
-      //   ],
-      // ),
+      appBar: AppBar(
+        title: TextField(
+          controller: _searchController,
+          decoration: InputDecoration(
+            hintText: 'Search a city...',
+            suffixIcon: IconButton(
+              onPressed: () => _fetchWeather(_searchController.text),
+              icon: const Icon(Icons.search),
+            ),
+          ),
+        ),
+      ),
       body: RefreshIndicator(
         onRefresh: () => _fetchWeather(),
         child: SingleChildScrollView(
@@ -129,20 +135,20 @@ class _WeatherPageState extends State<WeatherPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const SizedBox(height: 100),
-                      // city name
+                      //? city name
                       Text(_weather?.cityName ?? 'loading city ...'),
 
-                      // animation
+                      //? animation
                       Lottie.asset(
                           getWeatherAnimation(_weather?.mainCondition)),
 
-                      // temperature
+                      //? temperature
                       Text('${_weather?.temperature.round().toString()} °C'),
 
-                      // weather condition
+                      //? weather condition
                       Text(_weather?.mainCondition ?? ''),
 
-                      // additional info
+                      //? additional info
                       Padding(
                         padding: const EdgeInsets.all(40),
                         child: Row(
