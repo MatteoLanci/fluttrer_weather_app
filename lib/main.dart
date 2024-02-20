@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:weather_app/pages/test_page.dart';
 import 'package:weather_app/pages/weather_page.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:weather_app/themes/themes.dart';
@@ -30,7 +31,8 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       title: 'Weather App',
       theme: _currentTheme,
-      home: WeatherPage(onThemeChange: _updateTheme),
+      // home: WeatherPage(onThemeChange: _updateTheme),
+      home: TestPage(),
     );
   }
 }

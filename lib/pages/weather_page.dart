@@ -23,6 +23,7 @@ class _WeatherPageState extends State<WeatherPage> {
   final _weatherService = WeatherService();
   Weather? _weather;
   bool _isError = false;
+  bool _isLoading = false;
 
   //? init state
   @override
@@ -35,6 +36,7 @@ class _WeatherPageState extends State<WeatherPage> {
   //? fetch weather method
   _fetchWeather([String? cityName]) async {
     setState(() {
+      _isLoading = true;
       _isError = false;
     });
 
@@ -49,12 +51,14 @@ class _WeatherPageState extends State<WeatherPage> {
 
       setState(() {
         _weather = weather;
+        _isLoading = false;
       });
     } catch (e) {
       print(e);
 
       setState(() {
         _isError = true;
+        _isLoading = false;
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -123,64 +127,67 @@ class _WeatherPageState extends State<WeatherPage> {
           ),
         ),
       ),
-      body: RefreshIndicator(
-        onRefresh: () => _fetchWeather(),
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: Center(
-            child: _isError
-                ? const Text(
-                    'Error while fetching weather data, please try again')
-                : Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: 100),
-                      //? city name
-                      Text(_weather?.cityName ?? 'loading city ...'),
-
-                      //? animation
-                      Lottie.asset(
-                          getWeatherAnimation(_weather?.mainCondition)),
-
-                      //? temperature
-                      Text('${_weather?.temperature.round().toString()} °C'),
-
-                      //? weather condition
-                      Text(_weather?.mainCondition ?? ''),
-
-                      //? additional info
-                      Padding(
-                        padding: const EdgeInsets.all(40),
-                        child: Row(
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : RefreshIndicator(
+              onRefresh: () => _fetchWeather(),
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Center(
+                  child: _isError
+                      ? const Text(
+                          'Error while fetching weather data, please try again')
+                      : Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.arrow_drop_down_sharp),
-                                Text(
-                                  '${_weather?.minTemp.round().toString()} °C',
-                                ),
-                              ],
-                            ),
-                            const SizedBox(width: 40),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.arrow_drop_up_sharp),
-                                Text(
-                                  '${_weather?.maxTemp.round().toString()} °C',
-                                ),
-                              ],
+                            const SizedBox(height: 100),
+                            //? city name
+                            Text(_weather?.cityName ?? 'loading city ...'),
+
+                            //? animation
+                            Lottie.asset(
+                                getWeatherAnimation(_weather?.mainCondition)),
+
+                            //? temperature
+                            Text(
+                                '${_weather?.temperature.round().toString()} °C'),
+
+                            //? weather condition
+                            Text(_weather?.mainCondition ?? ''),
+
+                            //? additional info
+                            Padding(
+                              padding: const EdgeInsets.all(40),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(Icons.arrow_drop_down_sharp),
+                                      Text(
+                                        '${_weather?.minTemp.round().toString()} °C',
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(width: 40),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(Icons.arrow_drop_up_sharp),
+                                      Text(
+                                        '${_weather?.maxTemp.round().toString()} °C',
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
-          ),
-        ),
-      ),
+                ),
+              ),
+            ),
     );
   }
 }
