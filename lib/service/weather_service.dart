@@ -7,6 +7,7 @@ import 'package:weather_app/models/weather_model.dart';
 import 'package:http/http.dart' as http;
 
 class WeatherService {
+  // ignore: constant_identifier_names
   static const BASE_URL = 'http://api.openweathermap.org/data/2.5/weather';
   final String apiKey = dotenv.env['OPENWEATHER_API_KEY']!;
 
@@ -39,7 +40,6 @@ class WeatherService {
     // convert the location into a list of placemark objects
     List<Placemark> placemarks =
         await placemarkFromCoordinates(position.latitude, position.longitude);
-    print(placemarks);
 
     // extract the city name from the first placemark
     String? city = placemarks[0].locality;
