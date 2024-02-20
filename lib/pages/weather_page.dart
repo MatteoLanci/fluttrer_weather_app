@@ -135,8 +135,21 @@ class _WeatherPageState extends State<WeatherPage> {
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: Center(
                   child: _isError
-                      ? const Text(
-                          'Error while fetching weather data, please try again')
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const SizedBox(height: 300),
+                              const Text(
+                                  'Error while fetching weather data, please try again'),
+                              const SizedBox(height: 50),
+                              ElevatedButton(
+                                onPressed: _fetchWeather,
+                                child: const Text('Try again'),
+                              ),
+                            ],
+                          ),
+                        )
                       : Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
